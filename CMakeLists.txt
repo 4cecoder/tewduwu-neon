@@ -15,6 +15,11 @@ find_package(glm REQUIRED)
 # Define source files
 set(SOURCES
     src/main.cpp
+    src/core/TodoItem.cpp
+    src/core/TodoList.cpp
+    src/renderer/VulkanContext.cpp
+    src/ui/GlassPanel.cpp
+    src/ui/TaskListWidget.cpp
     # Add implementation files as they're created
 )
 
@@ -23,6 +28,8 @@ set(HEADERS
     src/core/TodoItem.h
     src/core/TodoList.h
     src/renderer/VulkanContext.h
+    src/renderer/Shader.h
+    src/renderer/TextRenderer.h
     src/ui/GlassPanel.h
     src/ui/TaskListWidget.h
 )
@@ -87,10 +94,27 @@ add_custom_command(
     COMMENT "Copying shaders to output directory"
 )
 
+# Create fonts directory and copy example font (Inconsolata is used in the code)
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:${PROJECT_NAME}>/fonts
+    COMMENT "Creating fonts directory"
+)
+
 # Set output directories
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
+
+# Enable compiler warnings
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+endif()
+
+# Generate compile_commands.json for IDE code completion
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Installation
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
