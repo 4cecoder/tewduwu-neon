@@ -23,7 +23,7 @@ public:
     void createSurface(SDL_Window* window);
     void pickPhysicalDevice();
     void createLogicalDevice();
-    void createSwapChain();
+    void createSwapChain(SDL_Window* window);
     void createRenderPass();
     void createFramebuffers();
     void createCommandPool();

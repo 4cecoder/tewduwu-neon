@@ -28,7 +28,7 @@ if [ -z "$VULKAN_SDK" ]; then
     echo -e "${RED}ERROR: VULKAN_SDK environment variable not set${NC}"
     echo "Please install the Vulkan SDK from https://vulkan.lunarg.com/"
     echo "Then set VULKAN_SDK environment variable, e.g.:"
-    echo "    export VULKAN_SDK=~/VulkanSDK/1.3.xxx.0/macOS"
+    echo "    export VULKAN_SDK=/Users/fource/VulkanSDK/1.3.275.0/macOS"
     exit 1
 fi
 

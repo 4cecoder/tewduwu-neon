@@ -207,24 +207,24 @@ bool TaskListWidget::handleKeyInput(int keyCode) {
     
     switch (keyCode) {
         case SDLK_UP:
-        case SDLK_k:
+        case SDLK_K:
             return todoList->selectPrevious();
             
         case SDLK_DOWN:
-        case SDLK_j:
+        case SDLK_J:
             return todoList->selectNext();
             
-        case SDLK_h:
+        case SDLK_H:
             return todoList->selectParent();
             
-        case SDLK_l:
+        case SDLK_L:
             return todoList->selectFirstChild();
             
         case SDLK_SPACE:
             todoList->toggleItem(todoList->getSelectedIndex());
             return true;
             
-        case SDLK_d:
+        case SDLK_D:
             todoList->removeItem(todoList->getSelectedIndex());
             return true;
             
@@ -244,7 +244,7 @@ bool TaskListWidget::handleKeyInput(int keyCode) {
             todoList->changePriority(todoList->getSelectedIndex(), Priority::NONE);
             return true;
             
-        case SDLK_a: {
+        case SDLK_A: {
             // Add item - this would need user input
             // For now, add a placeholder item
             todoList->addItem("New Task", 0, Priority::NONE);
@@ -252,7 +252,7 @@ bool TaskListWidget::handleKeyInput(int keyCode) {
             return true;
         }
         
-        case SDLK_i: {
+        case SDLK_I: {
             // Add subtask - this would need user input
             auto currentIdx = todoList->getSelectedIndex();
             auto currentItem = todoList->getItem(currentIdx);
@@ -264,14 +264,6 @@ bool TaskListWidget::handleKeyInput(int keyCode) {
             }
             return false;
         }
-        
-        case SDLK_J:
-            todoList->moveItemDown(todoList->getSelectedIndex());
-            return true;
-            
-        case SDLK_K:
-            todoList->moveItemUp(todoList->getSelectedIndex());
-            return true;
     }
     
     return false;
@@ -321,7 +313,7 @@ void TaskListWidget::update(float deltaTime) {
         
         // Update glass panel animation
         if (glassPanel) {
-            glassPanel->setAnimationProgress(glassPanel->setAnimationProgress + deltaTime);
+            // Animation progress seems handled per-item in renderTaskItem
         }
         
         // Update items

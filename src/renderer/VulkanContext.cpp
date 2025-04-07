@@ -1,3 +1,5 @@
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
 #include "VulkanContext.h"
 #include <iostream>
 #include <set>
@@ -74,7 +76,7 @@ bool VulkanContext::initialize(SDL_Window* window) {
     createSurface(window);
     pickPhysicalDevice();
     createLogicalDevice();
-    createSwapChain();
+    createSwapChain(window);
     createRenderPass();
     createFramebuffers();
     createCommandPool();
@@ -145,18 +147,15 @@ void VulkanContext::createInstance() {
     createInfo.pApplicationInfo = &appInfo;
     
     // Get required extensions
-    unsigned int extensionCount = 0;
-    if (!SDL_Vulkan_GetInstanceExtensions(nullptr, &extensionCount, nullptr)) {
-        throw std::runtime_error("Failed to get required Vulkan extensions count from SDL");
+    Uint32 sdlExtensionCount = 0;
+    const char* const* sdlExtensions = SDL_Vulkan_GetInstanceExtensions(&sdlExtensionCount);
+    if (sdlExtensions == nullptr) {
+        throw std::runtime_error("Failed to get required Vulkan extensions from SDL: " + std::string(SDL_GetError()));
     }
-    
-    std::vector<const char*> extensions(extensionCount);
-    if (!SDL_Vulkan_GetInstanceExtensions(nullptr, &extensionCount, extensions.data())) {
-        throw std::runtime_error("Failed to get required Vulkan extensions from SDL");
-    }
-    
-    // Add debug extensions if needed
-    extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+    // Combine SDL extensions with our debug extension
+    std::vector<const char*> extensions(sdlExtensions, sdlExtensions + sdlExtensionCount);
+    extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME); // Add debug utils extension
     
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
@@ -193,7 +192,7 @@ void VulkanContext::setupDebugMessenger() {
 }
 
 void VulkanContext::createSurface(SDL_Window* window) {
-    if (!SDL_Vulkan_CreateSurface(window, instance, &surface)) {
+    if (!SDL_Vulkan_CreateSurface(window, instance, nullptr, &surface)) {
         throw std::runtime_error("Failed to create Vulkan surface");
     }
 }
@@ -343,7 +342,7 @@ void VulkanContext::createLogicalDevice() {
     vkGetDeviceQueue(device, presentFamily, 0, &presentQueue);
 }
 
-void VulkanContext::createSwapChain() {
+void VulkanContext::createSwapChain(SDL_Window* window) {
     // Query surface capabilities
     VkSurfaceCapabilitiesKHR capabilities;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities);
@@ -392,7 +391,7 @@ void VulkanContext::createSwapChain() {
         extent = capabilities.currentExtent;
     } else {
         int width, height;
-        SDL_Vulkan_GetDrawableSize(nullptr, &width, &height);
+        SDL_GetWindowSizeInPixels(window, &width, &height);
         
         extent.width = std::clamp(static_cast<uint32_t>(width), 
                                 capabilities.minImageExtent.width, 

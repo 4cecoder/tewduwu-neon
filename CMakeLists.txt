@@ -18,6 +18,8 @@ set(SOURCES
     src/core/TodoItem.cpp
     src/core/TodoList.cpp
     src/renderer/VulkanContext.cpp
+    src/renderer/Shader.cpp
+    src/renderer/TextRenderer.cpp
     src/ui/GlassPanel.cpp
     src/ui/TaskListWidget.cpp
     # Add implementation files as they're created
@@ -74,9 +76,9 @@ foreach(SHADER ${SHADERS})
     
     add_custom_command(
         OUTPUT ${SHADER_OUTPUT}
-        COMMAND ${GLSLC_EXECUTABLE} -o ${SHADER_OUTPUT} ${SHADER}
-        DEPENDS ${SHADER}
-        COMMENT "Compiling shader: ${SHADER}"
+        COMMAND ${GLSLC_EXECUTABLE} -o ${SHADER_OUTPUT} ${CMAKE_CURRENT_SOURCE_DIR}/${SHADER}
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${SHADER}
+        COMMENT "Compiling shader: ${CMAKE_CURRENT_SOURCE_DIR}/${SHADER}"
     )
     
     list(APPEND SHADER_OUTPUTS ${SHADER_OUTPUT})

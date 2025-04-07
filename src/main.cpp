@@ -17,6 +17,7 @@ int main(int argc, char* argv[]) {
     try {
         // Initialize SDL
         if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+            std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
             throw std::runtime_error("Failed to initialize SDL: " + std::string(SDL_GetError()));
         }
         
@@ -71,10 +72,10 @@ int main(int argc, char* argv[]) {
                 if (event.type == SDL_EVENT_QUIT) {
                     running = false;
                 } else if (event.type == SDL_EVENT_KEY_DOWN) {
-                    if (event.key.keysym.sym == SDLK_ESCAPE) {
+                    if (event.key.key == SDLK_ESCAPE) {
                         running = false;
                     } else {
-                        taskListWidget->handleKeyInput(event.key.keysym.sym);
+                        taskListWidget->handleKeyInput(event.key.key);
                     }
                 }
             }
