@@ -30,10 +30,17 @@ public:
     void createCommandBuffers();
     void createSyncObjects();
     
+    // Swap chain recreation
+    void recreateSwapChain(SDL_Window* window);
+    void cleanupSwapChain();
+    
     // Rendering functions
     void beginFrame();
     void endFrame();
     void waitIdle();
+    
+    // Handle window resize
+    void framebufferResizedCallback() { framebufferResized = true; }
     
     // Accessors
     VkDevice getDevice() const;
@@ -41,6 +48,8 @@ public:
     VkCommandPool getCommandPool() const;
     VkRenderPass getRenderPass() const;
     VkExtent2D getSwapChainExtent() const;
+    VkCommandBuffer getCurrentCommandBuffer() const;
+    VkDescriptorPool getDescriptorPool() const;
     
 private:
     // Vulkan objects
@@ -60,6 +69,7 @@ private:
     std::vector<VkFramebuffer> swapChainFramebuffers;
     VkCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;
+    VkDescriptorPool descriptorPool;
     
     // Sync objects
     std::vector<VkSemaphore> imageAvailableSemaphores;
@@ -67,8 +77,16 @@ private:
     std::vector<VkFence> inFlightFences;
     
     // State
+    SDL_Window* window;  // Store window pointer for recreating swap chain
     size_t currentFrame;
     bool framebufferResized;
+    uint32_t currentImageIndex;
+    
+    // Helper functions
+    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+    bool createDescriptorPool();
 };
 
 } // namespace tewduwu
