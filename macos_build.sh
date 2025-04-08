@@ -24,12 +24,19 @@ if ! command -v cmake &> /dev/null; then
 fi
 
 # Check for Vulkan SDK
-if [ -z "$VULKAN_SDK" ]; then
-    echo -e "${RED}ERROR: VULKAN_SDK environment variable not set${NC}"
-    echo "Please install the Vulkan SDK from https://vulkan.lunarg.com/"
-    echo "Then set VULKAN_SDK environment variable, e.g.:"
-    echo "    export VULKAN_SDK=/Users/fource/VulkanSDK/1.3.275.0/macOS"
+# Attempt to find Vulkan SDK path using Homebrew
+echo -e "${CYAN}Attempting to locate Vulkan SDK via Homebrew...${NC}"
+VULKAN_SDK_PATH=$(brew --prefix vulkan-headers 2>/dev/null)
+
+if [ -z "$VULKAN_SDK_PATH" ] || [ ! -d "$VULKAN_SDK_PATH/include/vulkan" ]; then
+    echo -e "${RED}ERROR: Could not automatically find Vulkan SDK headers via Homebrew.${NC}"
+    echo "Please ensure 'vulkan-headers' is installed:"
+    echo "    brew install vulkan-headers"
+    echo "Alternatively, manually set the VULKAN_SDK environment variable."
     exit 1
+else
+    echo -e "${GREEN}Found Vulkan headers at: ${VULKAN_SDK_PATH}${NC}"
+    export VULKAN_SDK=$VULKAN_SDK_PATH # Export for CMake find_package
 fi
 
 # Check for other dependencies
