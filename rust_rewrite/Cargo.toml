@@ -1,0 +1,49 @@
+[package]
+name = "tewduwu"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# Window and event loop handling
+winit = "0.29.10"
+# Async utilities
+pollster = "0.3.0"
+# Logging
+log = "0.4.20"
+env_logger = "0.10.1"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.108"
+
+# Core components for our app
+uuid = { version = "1.6.1", features = ["v4", "serde"] }
+
+# Graphics - use wgpu 23.0.1 to match wgpu_glyph
+wgpu = "23.0.1"
+wgpu_glyph = "0.23.0"
+chrono = "0.4.40"
+# We don't need to specify glyph_brush or ab_glyph as direct dependencies
+
+# Enable WASM support when targeting wasm32 (for future use)
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+console_error_panic_hook = "0.1.7"                                  # Better panic messages in browser console
+console_log = "1.0.0"                                               # Logging to browser console
+web-sys = { version = "0.3.64", features = ["Window", "Document"] }
+
+# Default-run to make development easier
+[package.metadata]
+default-run = "tewduwu"
+
+# Raw window handle for wgpu
+raw-window-handle = "0.6"
+
+# Define examples
+[[example]]
+name = "todo_ui_demo"
+path = "examples/todo_ui_demo.rs"
+
+# Handling uniform buffer data
+bytemuck = { version = "1.14.0", features = ["derive"] }
