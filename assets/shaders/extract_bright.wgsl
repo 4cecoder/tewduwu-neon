@@ -38,9 +38,9 @@ fn fs_main(@builtin(position) frag_coord: vec4<f32>) -> @location(0) vec4<f32> {
     var bright_color = vec4<f32>(0.0, 0.0, 0.0, 0.0);
     if (brightness > threshold) {
         // Apply soft threshold
-        let soft_threshold = 0.1;
-        let knee = threshold * soft_threshold;
-        let soft = brightness - threshold + knee;
+        let soft_threshold_factor = 0.1;
+        let knee = threshold * soft_threshold_factor;
+        var soft = brightness - threshold + knee;
         soft = clamp(soft / (2.0 * knee), 0.0, 1.0);
         
         // Apply threshold with smoothing

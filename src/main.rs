@@ -264,7 +264,7 @@ impl State {
             &theme
         );
 
-        // Resize effects to match window size
+        // Initialize effects with the window size
         bloom_effect.resize(size.width, size.height);
 
         info!("WGPU state initialized successfully.");
@@ -414,7 +414,7 @@ impl State {
         self.bloom_effect.apply(&mut encoder, &scene_view, &bloom_view);
         
         // --- Render modals and other UI overlays ---
-        // Now render the modals on top of the bloom result
+        // Draw the modals on top of the bloom result
         self.todo_list_widget.render_modals(&mut render_ctx);
         
         self.glyph_brush

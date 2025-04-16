@@ -1,7 +1,32 @@
 // Post-processing renderer for bloom and glow effects
 use wgpu::*;
 use std::sync::Arc;
+use bytemuck::{Pod, Zeroable};
 use super::CyberpunkTheme;
+
+// Define uniform buffer data structs with bytemuck
+#[repr(C)]
+#[derive(Copy, Clone, Debug, Pod, Zeroable)]
+struct ExtractUniforms {
+    threshold: f32,
+    intensity: f32,
+}
+
+#[repr(C)]
+#[derive(Copy, Clone, Debug, Pod, Zeroable)]
+struct CompositeUniforms {
+    intensity: f32,
+    saturation: f32,
+}
+
+#[repr(C)]
+#[derive(Copy, Clone, Debug, Pod, Zeroable)]
+struct GlowUniforms {
+    color: [f32; 4],
+    intensity: f32,
+    size: f32,
+    _padding: [f32; 2], // Ensure 16-byte alignment
+}
 
 // BloomEffect handles the extraction, blur, and compositing for the bloom effect
 pub struct BloomEffect {
@@ -56,14 +81,14 @@ impl BloomEffect {
         // Create uniform buffers
         let extract_uniform_buffer = device.create_buffer(&BufferDescriptor {
             label: Some("Bloom Extract Uniforms"),
-            size: 8, // 2 f32 values (threshold and intensity)
+            size: std::mem::size_of::<ExtractUniforms>() as u64,
             usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
         
         let composite_uniform_buffer = device.create_buffer(&BufferDescriptor {
             label: Some("Bloom Composite Uniforms"),
-            size: 8, // 2 f32 values (intensity and saturation)
+            size: std::mem::size_of::<CompositeUniforms>() as u64,
             usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -261,16 +286,26 @@ impl BloomEffect {
         let saturation = 1.1;
         
         // Update uniform buffers with initial values
+        let extract_uniforms = ExtractUniforms {
+            threshold,
+            intensity,
+        };
+        
+        let composite_uniforms = CompositeUniforms {
+            intensity,
+            saturation,
+        };
+        
         queue.write_buffer(
             &extract_uniform_buffer,
             0,
-            bytemuck::cast_slice(&[threshold, intensity]),
+            bytemuck::cast_slice(&[extract_uniforms]),
         );
         
         queue.write_buffer(
             &composite_uniform_buffer,
             0,
-            bytemuck::cast_slice(&[intensity, saturation]),
+            bytemuck::cast_slice(&[composite_uniforms]),
         );
         
         Self {
@@ -504,16 +539,26 @@ impl BloomEffect {
         self.saturation = saturation;
         
         // Update uniform buffers
+        let extract_uniforms = ExtractUniforms {
+            threshold,
+            intensity,
+        };
+        
+        let composite_uniforms = CompositeUniforms {
+            intensity,
+            saturation,
+        };
+        
         self.queue.write_buffer(
             &self.extract_uniform_buffer,
             0,
-            bytemuck::cast_slice(&[threshold, intensity]),
+            bytemuck::cast_slice(&[extract_uniforms]),
         );
         
         self.queue.write_buffer(
             &self.composite_uniform_buffer,
             0,
-            bytemuck::cast_slice(&[intensity, saturation]),
+            bytemuck::cast_slice(&[composite_uniforms]),
         );
     }
     
@@ -755,7 +800,7 @@ impl NeonGlowEffect {
         // Create uniform buffer
         let uniform_buffer = device.create_buffer(&BufferDescriptor {
             label: Some("Neon Glow Uniforms"),
-            size: 24, // vec4 (16 bytes) + 2 floats (8 bytes)
+            size: std::mem::size_of::<GlowUniforms>() as u64,
             usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -868,16 +913,17 @@ impl NeonGlowEffect {
         let size = 10.0;
         
         // Write initial uniform data
-        let uniform_data = [
-            color[0], color[1], color[2], color[3], // glow_color
-            intensity,                             // glow_intensity
-            size,                                  // glow_size
-        ];
+        let glow_uniforms = GlowUniforms {
+            color,
+            intensity,
+            size,
+            _padding: [0.0, 0.0], // Ensure 16-byte alignment
+        };
         
         queue.write_buffer(
             &uniform_buffer,
             0,
-            bytemuck::cast_slice(&uniform_data),
+            bytemuck::cast_slice(&[glow_uniforms]),
         );
         
         Self {
@@ -900,16 +946,17 @@ impl NeonGlowEffect {
         self.size = size;
         
         // Update uniform buffer
-        let uniform_data = [
-            color[0], color[1], color[2], color[3],
+        let glow_uniforms = GlowUniforms {
+            color,
             intensity,
             size,
-        ];
+            _padding: [0.0, 0.0],
+        };
         
         self.queue.write_buffer(
             &self.uniform_buffer,
             0,
-            bytemuck::cast_slice(&uniform_data),
+            bytemuck::cast_slice(&[glow_uniforms]),
         );
     }
     

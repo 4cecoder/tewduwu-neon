@@ -8,20 +8,18 @@ pub mod todo_item_widget;
 pub mod todo_list_widget;
 pub mod context;
 pub mod theme;
-pub mod renderer; // Add the new renderer module
-
-// Re-export widgets module
+pub mod renderer; // Post-processing renderer
 pub mod widgets;
 
 // UI components: Widget trait implementations
-use button::Button;
-use text_input::TextInput;
-use panel::Panel;
-use todo_item_widget::TodoItemWidget;
-use todo_list_widget::TodoListWidget;
-use context::RenderContext;
-use theme::CyberpunkTheme;
-use renderer::prelude::*; // Re-export the renderer types
+pub use button::Button;
+pub use text_input::TextInput;
+pub use panel::Panel;
+pub use todo_item_widget::TodoItemWidget;
+pub use todo_list_widget::TodoListWidget;
+pub use context::RenderContext;
+pub use theme::CyberpunkTheme;
+pub use renderer::prelude::*; // Export the renderer types
 
 /// Trait all UI widgets must implement
 pub trait Widget {
@@ -63,6 +61,6 @@ pub mod prelude {
     pub use super::RenderContext;
     pub use super::CyberpunkTheme;
     pub use super::widgets;
-    pub use super::BloomEffect; // Export the BloomEffect
-    pub use super::NeonGlowEffect; // Export the NeonGlowEffect
+    pub use super::BloomEffect;
+    pub use super::NeonGlowEffect;
 }

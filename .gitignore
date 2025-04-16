@@ -1,1 +1,61 @@
-c/sdl_test
+# Rust build artifacts
+/target/
+*.rs.bk
+
+# Binary files
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Cargo.lock is typically included for applications but excluded for libraries
+# Uncomment the line below if this is a library
+# Cargo.lock
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+.vs/
+*.sublime-*
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project-specific files
+*.log
+*.trace
+*.wgpu_trace
+
+# Shader compilation artifacts
+*.spv
+
+# Debug and profiling artifacts
+flamegraph.svg
+perf.data*
+*.profile
+
+# Environment variables
+.env
+.env.local
+
+# Documentation generated artifacts
+/doc/
+/book/
+
+# Custom build artifacts
+/build/
+/dist/
+
+# Project-specific folders
+/assets/tmp/
+.cursor/ 
